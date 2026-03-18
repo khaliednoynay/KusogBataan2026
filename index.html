@@ -1,1128 +1,186 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Fuel Price Monitoring — Mariveles, Bataan</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --ink:#0A0C10;
-  --ink2:#1C2030;
-  --muted:#6B7280;
-  --border:#E5E7EB;
-  --surface:#F9FAFB;
-  --white:#FFFFFF;
-  --navy:#0F2557;
-  --navy2:#1A3A7A;
-  --gold:#C8961E;
-  --gold2:#F0B429;
-  --red:#B91C1C;
-  --green:#15803D;
-  --accent:#1D4ED8;
-  --radius:2px;
-}
-html{font-size:15px}
-body{
-  font-family:'DM Sans',sans-serif;
-  background:var(--surface);
-  color:var(--ink);
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-
-/* ── MASTHEAD ── */
-.masthead{
-  width:100%;
-  background:var(--navy);
-  position:relative;
-  overflow:hidden;
-}
-.masthead::before{
-  content:'';
-  position:absolute;
-  inset:0;
-  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cg transform='translate(0 0)'%3E%3Cpolygon points='60 60 0 60 0 0'/%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  opacity:0.5;
-}
-.flag-bar{height:5px;background:linear-gradient(90deg,var(--red) 50%,var(--navy) 50%)}
-.masthead-inner{
-  max-width:900px;
-  margin:0 auto;
-  padding:28px 24px 32px;
-  display:flex;
-  align-items:center;
-  gap:24px;
-  position:relative;
-  z-index:1;
-}
-.seal-wrap{
-  flex-shrink:0;
-  width:68px;height:68px;
-  border-radius:50%;
-  overflow:hidden;
-  border:2px solid rgba(200,150,30,0.5);
-  box-shadow:0 0 0 4px rgba(200,150,30,0.15);
-}
-.seal-wrap img{width:100%;height:100%;object-fit:cover}
-.masthead-text{}
-.masthead-eyebrow{
-  font-family:'DM Sans',sans-serif;
-  font-size:10px;
-  font-weight:500;
-  letter-spacing:3px;
-  text-transform:uppercase;
-  color:var(--gold2);
-  opacity:.85;
-  margin-bottom:5px;
-}
-.masthead-title{
-  font-family:'DM Serif Display',serif;
-  font-size:clamp(20px,4vw,30px);
-  color:#fff;
-  line-height:1.1;
-  margin-bottom:4px;
-}
-.masthead-sub{
-  font-size:11px;
-  color:rgba(255,255,255,.4);
-  letter-spacing:2px;
-  text-transform:uppercase;
-}
-.station-pill{
-  display:none;
-  margin-left:auto;
-  background:rgba(200,150,30,.15);
-  border:1px solid rgba(200,150,30,.35);
-  border-radius:2px;
-  padding:6px 14px;
-  font-family:'DM Sans',sans-serif;
-  font-size:11px;
-  font-weight:600;
-  letter-spacing:2px;
-  text-transform:uppercase;
-  color:var(--gold2);
-  white-space:nowrap;
-}
-.station-pill.show{display:block}
-
-/* ── PANEL ── */
-.panel{
-  background:var(--white);
-  width:min(520px,calc(100% - 32px));
-  margin-top:-12px;
-  border:1px solid var(--border);
-  box-shadow:0 1px 3px rgba(0,0,0,.06),0 8px 32px rgba(0,0,0,.08);
-  animation:rise .5s cubic-bezier(.22,1,.36,1) both;
-}
-@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.panel-header{
-  border-bottom:1px solid var(--border);
-  padding:14px 20px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  background:var(--ink);
-}
-.panel-header-left{display:flex;align-items:center;gap:10px}
-.panel-dots{display:flex;gap:5px}
-.pd{width:9px;height:9px;border-radius:50%}
-.pd1{background:#FF5F57}.pd2{background:#FEBC2E}.pd3{background:#28C840}
-.panel-label{
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px;
-  font-weight:600;
-  letter-spacing:2px;
-  text-transform:uppercase;
-  color:rgba(255,255,255,.4);
-}
-.panel-body{padding:28px 24px 32px}
-
-/* ── LOGIN ── */
-.login-intro{margin-bottom:24px}
-.login-heading{
-  font-family:'DM Serif Display',serif;
-  font-size:22px;
-  color:var(--ink);
-  margin-bottom:4px;
-}
-.login-sub{font-size:13px;color:var(--muted);line-height:1.5}
-.field{margin-bottom:16px}
-.field-label{
-  display:block;
-  font-size:10px;
-  font-weight:600;
-  letter-spacing:2.5px;
-  text-transform:uppercase;
-  color:var(--muted);
-  margin-bottom:7px;
-}
-.field input{
-  width:100%;
-  font-family:'DM Sans',sans-serif;
-  font-size:14px;
-  font-weight:500;
-  color:var(--ink);
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:11px 14px;
-  outline:none;
-  transition:border-color .15s,background .15s,box-shadow .15s;
-}
-.field input:focus{
-  border-color:var(--accent);
-  background:var(--white);
-  box-shadow:0 0 0 3px rgba(29,78,216,.08);
-}
-.field input.err{border-color:var(--red)!important}
-.pw-wrap{position:relative}
-.pw-toggle{
-  position:absolute;right:12px;top:50%;transform:translateY(-50%);
-  background:none;border:none;cursor:pointer;
-  font-size:11px;font-weight:600;letter-spacing:1px;
-  color:var(--muted);padding:0;font-family:'DM Sans',sans-serif;
-  text-transform:uppercase;
-}
-.pw-toggle:hover{color:var(--ink)}
-.alert{
-  display:none;
-  background:#FEF2F2;
-  border:1px solid #FECACA;
-  border-radius:var(--radius);
-  padding:10px 14px;
-  font-size:12.5px;
-  color:var(--red);
-  margin-bottom:14px;
-  line-height:1.5;
-}
-.alert.show{display:block}
-.btn-primary{
-  width:100%;
-  padding:13px;
-  background:var(--navy);
-  color:#fff;
-  font-family:'DM Sans',sans-serif;
-  font-size:13px;
-  font-weight:600;
-  letter-spacing:2px;
-  text-transform:uppercase;
-  border:none;
-  border-radius:var(--radius);
-  cursor:pointer;
-  transition:background .15s,transform .1s,box-shadow .15s;
-  margin-top:4px;
-}
-.btn-primary:hover{background:var(--navy2);box-shadow:0 4px 12px rgba(15,37,87,.25)}
-.btn-primary:active{transform:scale(.99)}
-.btn-primary:disabled{background:#9CA3AF;cursor:not-allowed;box-shadow:none}
-.login-footer{
-  margin-top:20px;
-  padding-top:16px;
-  border-top:1px solid var(--border);
-  font-size:11.5px;
-  color:var(--muted);
-  line-height:1.6;
-}
-
-/* ── TOP BAR ── */
-.top-bar{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:10px 20px;
-  border-bottom:1px solid var(--border);
-  background:var(--surface);
-}
-.top-bar-station{font-size:12px;color:var(--muted)}
-.top-bar-station strong{color:var(--navy);font-weight:600}
-.btn-link{
-  font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
-  color:var(--red);background:none;border:none;cursor:pointer;
-  padding:0;font-family:'DM Sans',sans-serif;
-  border-bottom:1px solid transparent;
-  transition:border-color .15s;
-}
-.btn-link:hover{border-color:var(--red)}
-
-/* ── FORM ── */
-#formScreen{display:none}
-#formScreen.show{display:block}
-.station-banner{
-  background:var(--navy);
-  padding:14px 20px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-}
-.station-banner-info{}
-.station-banner-tag{
-  font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;
-  color:rgba(255,255,255,.4);margin-bottom:3px;
-}
-.station-banner-name{
-  font-family:'DM Serif Display',serif;
-  font-size:18px;color:#fff;line-height:1.1;margin-bottom:2px;
-}
-.station-banner-loc{font-size:11px;color:rgba(255,255,255,.5)}
-.station-banner-lock{
-  font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;
-  color:var(--gold);border:1px solid rgba(200,150,30,.3);
-  padding:4px 10px;border-radius:2px;white-space:nowrap;
-  background:rgba(200,150,30,.08);
-}
-.form-body{padding:24px 20px 28px}
-.section-head{
-  font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
-  color:var(--muted);margin-bottom:12px;margin-top:22px;
-  display:flex;align-items:center;gap:8px;
-}
-.section-head:first-child{margin-top:0}
-.section-head::after{content:'';flex:1;height:1px;background:var(--border)}
-.price-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.price-box{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.price-box-head{
-  padding:8px 10px 7px;
-  font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
-}
-.price-box.diesel .price-box-head{background:#EFF6FF;color:#1E40AF;border-bottom:1px solid #BFDBFE}
-.price-box.unl .price-box-head{background:#FEF2F2;color:#991B1B;border-bottom:1px solid #FECACA}
-.price-box.prem .price-box-head{background:#F5F3FF;color:#5B21B6;border-bottom:1px solid #DDD6FE}
-.price-input-wrap{position:relative;background:var(--surface)}
-.price-symbol{
-  position:absolute;left:9px;top:50%;transform:translateY(-50%);
-  font-size:12px;font-weight:700;color:var(--muted);font-family:'JetBrains Mono',monospace;
-  pointer-events:none;
-}
-.price-input-wrap input{
-  width:100%;
-  font-family:'JetBrains Mono',monospace;
-  font-size:16px;font-weight:600;
-  color:var(--ink);
-  background:transparent;
-  border:none;
-  padding:10px 8px 10px 22px;
-  outline:none;
-}
-.price-input-wrap input:focus{background:var(--white)}
-.form-field{margin-bottom:0}
-.form-field + .form-field{margin-top:12px}
-.form-field input, .form-field textarea{
-  width:100%;
-  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:400;
-  color:var(--ink);background:var(--surface);
-  border:1px solid var(--border);border-radius:var(--radius);
-  padding:10px 13px;outline:none;
-  transition:border-color .15s,background .15s,box-shadow .15s;
-}
-.form-field input:focus, .form-field textarea:focus{
-  border-color:var(--accent);background:var(--white);
-  box-shadow:0 0 0 3px rgba(29,78,216,.08);
-}
-.form-field textarea{resize:vertical;min-height:64px;font-size:13px}
-.form-field input.err{border-color:var(--red)!important}
-.hint{font-size:11px;color:var(--muted);margin-top:5px}
-.err-msg{font-size:11px;color:var(--red);margin-top:4px;display:none}
-.err-msg.show{display:block}
-.divider{height:1px;background:var(--border);margin:20px 0}
-.req{color:var(--red)}
-.btn-submit{
-  width:100%;padding:13px;
-  background:var(--navy);color:#fff;
-  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
-  letter-spacing:2px;text-transform:uppercase;
-  border:none;border-radius:var(--radius);cursor:pointer;
-  transition:background .15s,box-shadow .15s;
-}
-.btn-submit:hover{background:var(--navy2);box-shadow:0 4px 12px rgba(15,37,87,.25)}
-
-/* ── SUCCESS ── */
-.success-pane{display:none;padding:40px 24px;text-align:center}
-.success-pane.show{display:block}
-.success-check{
-  width:52px;height:52px;border-radius:50%;
-  background:var(--green);margin:0 auto 16px;
-  display:flex;align-items:center;justify-content:center;
-  animation:pop .45s cubic-bezier(.22,1,.36,1) both;
-}
-@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
-.success-check svg{width:22px;height:22px;stroke:#fff;stroke-width:2.5;fill:none}
-.success-title{
-  font-family:'DM Serif Display',serif;font-size:22px;
-  color:var(--ink);margin-bottom:6px;
-}
-.success-sub{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:22px}
-.btn-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.btn-outline{
-  padding:9px 20px;background:transparent;
-  border:1px solid var(--border);border-radius:var(--radius);
-  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;
-  letter-spacing:1.5px;text-transform:uppercase;color:var(--ink);
-  cursor:pointer;transition:all .15s;
-}
-.btn-outline:hover{border-color:var(--navy);color:var(--navy)}
-.btn-danger{
-  padding:9px 20px;
-  background:var(--red);color:#fff;
-  border:none;border-radius:var(--radius);
-  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;
-  letter-spacing:1.5px;text-transform:uppercase;
-  cursor:pointer;transition:background .15s;
-}
-.btn-danger:hover{background:#991B1B}
-
-/* ── ADMIN ── */
-.admin-wrap{display:none;width:min(860px,calc(100% - 32px));margin-top:16px}
-.admin-wrap.show{display:block}
-.admin-panel{
-  background:var(--white);
-  border:1px solid var(--border);
-  box-shadow:0 1px 3px rgba(0,0,0,.06),0 8px 32px rgba(0,0,0,.08);
-  animation:rise .5s cubic-bezier(.22,1,.36,1) both;
-}
-.admin-header{
-  background:var(--ink);
-  padding:16px 24px;
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
-}
-.admin-header-left{display:flex;align-items:center;gap:16px}
-.admin-title{
-  font-family:'DM Serif Display',serif;font-size:18px;color:#fff;
-}
-.admin-subtitle{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px}
-.admin-body{padding:28px 24px}
-
-/* Summary strips */
-.summary-strip{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
-  background:var(--border);border:1px solid var(--border);
-  margin-bottom:28px;
-}
-.summary-cell{
-  background:var(--white);padding:16px 18px;
-}
-.summary-fuel{
-  font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
-  margin-bottom:10px;
-}
-.summary-cell.d .summary-fuel{color:#1E40AF}
-.summary-cell.u .summary-fuel{color:#991B1B}
-.summary-cell.p .summary-fuel{color:#5B21B6}
-.summary-stat{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
-.summary-stat:last-child{margin-bottom:0}
-.summary-stat span:first-child{color:var(--muted)}
-.summary-stat span:last-child{
-  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--ink);
-}
-.summary-stat.lo span:last-child{color:var(--green)}
-.summary-stat.hi span:last-child{color:var(--red)}
-
-/* Price table */
-.table-header{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:14px;flex-wrap:wrap;gap:10px;
-}
-.table-title{
-  font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);
-}
-.updated-badge{
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px;color:var(--muted);
-  background:var(--surface);border:1px solid var(--border);
-  padding:4px 10px;border-radius:2px;
-}
-.btn-pdf{
-  padding:8px 16px;background:var(--red);color:#fff;
-  border:none;border-radius:var(--radius);
-  font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;
-  letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;
-  transition:background .15s;
-}
-.btn-pdf:hover{background:#991B1B}
-.btn-pdf:disabled{background:#9CA3AF;cursor:not-allowed}
-.tbl-wrap{overflow-x:auto;margin-bottom:28px}
-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px}
-thead tr{border-bottom:2px solid var(--ink)}
-th{
-  font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
-  color:var(--muted);padding:8px 10px;text-align:left;white-space:nowrap;
-}
-td{padding:11px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:var(--surface)}
-.stn-name{font-weight:600;font-size:13px;color:var(--ink)}
-.stn-loc{font-size:10px;color:var(--muted);margin-top:1px}
-.price-val{
-  font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--ink);
-}
-.price-val.lo{color:var(--green)}
-.price-val.hi{color:var(--red)}
-.price-val.na{color:var(--border);font-weight:400;font-size:11px}
-.tag{
-  display:inline-block;font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
-  padding:2px 5px;border-radius:2px;margin-left:4px;vertical-align:middle;
-}
-.tag.lo{background:#DCFCE7;color:var(--green)}
-.tag.hi{background:#FEE2E2;color:var(--red)}
-.time-val{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)}
-.no-data{text-align:center;padding:40px;color:var(--muted);font-size:13px}
-
-/* Footer */
-.site-footer{
-  margin-top:24px;margin-bottom:48px;
-  text-align:center;font-size:11px;color:var(--muted);line-height:1.8;
-}
-.site-footer strong{color:var(--navy)}
-
-/* ── PRINT ── */
-@media print{body{background:#fff}.masthead,.site-footer{display:none}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KUSOG LUZON CONFERENCE 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        kusog: {
+                            dark: '#1a1c18',
+                            mid: '#2d3029',
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['Oswald', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hero-bg {
+            background: linear-gradient(rgba(26,28,24,0.82), rgba(26,28,24,0.93)), url('https://images.unsplash.com/photo-1483726234545-481d6e7c10b2?q=80&w=2000&auto=format&fit=crop') center/cover;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-white text-kusog-dark font-body antialiased">
 
-<div class="masthead">
-  <div class="flag-bar"></div>
-  <div class="masthead-inner">
-    <div class="seal-wrap">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEQAAABECAYAAAA4E5OxAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAA" alt="Seal"/>
-    </div>
-    <div class="masthead-text">
-      <div class="masthead-eyebrow">Republic of the Philippines &middot; Province of Bataan</div>
-      <div class="masthead-title">Municipal Government of Mariveles</div>
-      <div class="masthead-sub">Fuel Price Monitoring System</div>
-    </div>
-    <div class="station-pill" id="stationPill"></div>
-  </div>
-</div>
-
-<!-- LOGIN / FORM PANEL -->
-<div class="panel" id="mainPanel">
-  <div class="panel-header">
-    <div class="panel-header-left">
-      <div class="panel-dots"><div class="pd pd1"></div><div class="pd pd2"></div><div class="pd pd3"></div></div>
-      <div class="panel-label" id="panelLabel">Station Authentication</div>
-    </div>
-  </div>
-
-  <!-- LOGIN -->
-  <div id="loginScreen">
-    <div class="panel-body">
-      <div class="login-intro">
-        <div class="login-heading">Sign in to your station</div>
-        <div class="login-sub">Enter the credentials issued by the Municipal Government of Mariveles.</div>
-      </div>
-      <div class="alert" id="loginAlert"></div>
-      <div class="field">
-        <label class="field-label" for="username">Username</label>
-        <input type="text" id="username" placeholder="e.g. shell_alasasin" autocomplete="username" autocapitalize="none"/>
-      </div>
-      <div class="field">
-        <label class="field-label" for="password">Password</label>
-        <div class="pw-wrap">
-          <input type="password" id="password" placeholder="Enter password" autocomplete="current-password"/>
-          <button class="pw-toggle" type="button" id="pwToggle" onclick="togglePw()">Show</button>
-        </div>
-      </div>
-      <button class="btn-primary" id="btnLogin" onclick="doLogin()">Sign In</button>
-      <div class="login-footer">
-        Credentials are issued exclusively by the <strong>Municipal Government of Mariveles</strong>. Contact the LGU office if you need assistance.
-      </div>
-    </div>
-  </div>
-
-  <!-- FORM -->
-  <div id="formScreen">
-    <div class="top-bar">
-      <div class="top-bar-station">Signed in as <strong id="loggedInAs"></strong></div>
-      <button class="btn-link" onclick="doLogout()">Sign out</button>
-    </div>
-    <div class="station-banner">
-      <div class="station-banner-info">
-        <div class="station-banner-tag">Registered Station</div>
-        <div class="station-banner-name" id="lockName"></div>
-        <div class="station-banner-loc" id="lockLoc"></div>
-      </div>
-      <div class="station-banner-lock">Verified &middot; Locked</div>
-    </div>
-    <div class="form-body" id="formBody">
-      <form id="priceForm" novalidate>
-        <div class="section-head">Fuel Prices <span class="req">*</span></div>
-        <div class="price-row">
-          <div class="price-box diesel">
-            <div class="price-box-head">Diesel</div>
-            <div class="price-input-wrap">
-              <span class="price-symbol">&#8369;</span>
-              <input type="number" id="diesel" step="0.01" min="1" max="999" placeholder="0.00"/>
+    <!-- NAV -->
+    <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-md border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center gap-3">
+                    <svg class="h-10 w-10" viewBox="150 90 620 560" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 477.00 476.64 C477.00,607.21 476.75,640.00 475.74,640.00 C475.05,640.00 466.61,635.45 456.99,629.90 C447.37,624.34 433.20,616.17 425.50,611.73 C417.80,607.30 406.33,600.66 400.00,596.98 C380.16,585.45 369.01,578.99 352.50,569.48 C323.64,552.86 310.71,545.39 295.66,536.63 C287.50,531.88 280.63,528.00 280.39,528.00 C280.15,528.00 277.15,526.27 273.73,524.15 C270.30,522.03 261.76,517.03 254.75,513.03 L 242.00 505.76 L 242.00 369.13 L 242.01 232.50 L 254.75 225.23 C261.76,221.23 272.00,215.35 277.50,212.15 C283.00,208.95 296.73,201.00 308.00,194.48 C319.27,187.96 333.90,179.51 340.50,175.69 C347.10,171.87 363.08,162.68 376.00,155.26 C388.92,147.84 401.56,140.47 404.09,138.88 C406.61,137.30 409.20,136.00 409.84,136.00 C410.72,136.00 411.01,170.26 411.05,275.75 L 411.09 415.50 L 471.00 354.52 L 471.00 99.97 L 475.33 97.87 L 479.65 95.77 L 486.58 99.71 C495.23,104.64 510.75,113.67 518.00,117.99 C521.03,119.79 526.88,123.16 531.00,125.47 C535.12,127.78 548.17,135.30 560.00,142.17 C571.83,149.05 592.08,160.77 605.00,168.22 C641.98,189.53 643.00,190.14 643.00,190.84 C643.00,191.21 620.74,213.76 593.54,240.96 L 544.08 290.41 L 544.02 332.71 C543.99,355.97 544.31,375.00 544.74,375.00 C545.17,375.00 579.71,340.80 621.49,299.00 C663.27,257.20 698.03,223.00 698.75,223.00 C699.46,223.00 703.64,225.09 708.02,227.63 L 716.00 232.27 L 716.00 347.63 C716.00,411.09 715.66,463.00 715.25,463.00 C714.84,463.00 686.75,435.24 652.82,401.32 L 591.13 339.64 L 572.32 357.73 C561.97,367.68 552.04,377.34 550.26,379.20 L 547.02 382.57 L 617.01 452.46 C655.50,490.90 687.00,522.46 687.00,522.59 C687.00,522.72 685.09,523.91 682.75,525.22 C680.41,526.54 670.85,532.05 661.50,537.46 C596.83,574.90 559.99,596.17 550.50,601.58 L 539.50 607.84 L 539.25 448.42 C539.03,313.95 538.78,289.00 537.62,289.00 C536.23,289.00 535.08,289.44 520.50,295.48 C516.10,297.30 504.51,302.05 494.75,306.04 L 477.00 313.28 ZM 460.00 444.22 L 470.50 448.52 L 470.75 434.01 C471.40,395.74 471.44,365.02 470.84,365.25 C470.47,365.39 456.83,378.52 440.53,394.44 L 410.89 423.39 L 413.70 424.86 C415.24,425.67 420.10,427.78 424.50,429.56 C428.90,431.33 436.33,434.39 441.00,436.35 C445.67,438.31 454.23,441.85 460.00,444.22 Z" fill="#1a1c18"/>
+                    </svg>
+                    <span class="font-heading font-bold text-2xl tracking-wider text-kusog-dark">KUSOG NATION</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#about" class="text-gray-500 hover:text-kusog-dark transition px-3 py-2 text-sm uppercase tracking-widest">About</a>
+                    <a href="#recap" class="text-gray-500 hover:text-kusog-dark transition px-3 py-2 text-sm uppercase tracking-widest">Recap</a>
+                    <a href="#mission" class="text-gray-500 hover:text-kusog-dark transition px-3 py-2 text-sm uppercase tracking-widest">Mission</a>
+                    <a href="#register" class="bg-kusog-dark text-white font-bold px-6 py-2 rounded hover:bg-kusog-mid transition text-sm uppercase tracking-widest">Register Now</a>
+                </div>
             </div>
-          </div>
-          <div class="price-box unl">
-            <div class="price-box-head">Unleaded</div>
-            <div class="price-input-wrap">
-              <span class="price-symbol">&#8369;</span>
-              <input type="number" id="unleaded" step="0.01" min="1" max="999" placeholder="0.00"/>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero-bg min-h-screen flex items-center pt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-0">
+
+                <!-- LEFT — Giant Logo -->
+                <div class="flex-shrink-0 flex items-center justify-center lg:justify-start lg:w-1/2">
+                    <svg class="w-[320px] h-[320px] md:w-[440px] md:h-[440px] lg:w-[560px] lg:h-[560px]"
+                         style="filter: drop-shadow(0 0 60px rgba(255,255,255,0.12));"
+                         viewBox="150 90 620 560" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 477.00 476.64 C477.00,607.21 476.75,640.00 475.74,640.00 C475.05,640.00 466.61,635.45 456.99,629.90 C447.37,624.34 433.20,616.17 425.50,611.73 C417.80,607.30 406.33,600.66 400.00,596.98 C380.16,585.45 369.01,578.99 352.50,569.48 C323.64,552.86 310.71,545.39 295.66,536.63 C287.50,531.88 280.63,528.00 280.39,528.00 C280.15,528.00 277.15,526.27 273.73,524.15 C270.30,522.03 261.76,517.03 254.75,513.03 L 242.00 505.76 L 242.00 369.13 L 242.01 232.50 L 254.75 225.23 C261.76,221.23 272.00,215.35 277.50,212.15 C283.00,208.95 296.73,201.00 308.00,194.48 C319.27,187.96 333.90,179.51 340.50,175.69 C347.10,171.87 363.08,162.68 376.00,155.26 C388.92,147.84 401.56,140.47 404.09,138.88 C406.61,137.30 409.20,136.00 409.84,136.00 C410.72,136.00 411.01,170.26 411.05,275.75 L 411.09 415.50 L 471.00 354.52 L 471.00 99.97 L 475.33 97.87 L 479.65 95.77 L 486.58 99.71 C495.23,104.64 510.75,113.67 518.00,117.99 C521.03,119.79 526.88,123.16 531.00,125.47 C535.12,127.78 548.17,135.30 560.00,142.17 C571.83,149.05 592.08,160.77 605.00,168.22 C641.98,189.53 643.00,190.14 643.00,190.84 C643.00,191.21 620.74,213.76 593.54,240.96 L 544.08 290.41 L 544.02 332.71 C543.99,355.97 544.31,375.00 544.74,375.00 C545.17,375.00 579.71,340.80 621.49,299.00 C663.27,257.20 698.03,223.00 698.75,223.00 C699.46,223.00 703.64,225.09 708.02,227.63 L 716.00 232.27 L 716.00 347.63 C716.00,411.09 715.66,463.00 715.25,463.00 C714.84,463.00 686.75,435.24 652.82,401.32 L 591.13 339.64 L 572.32 357.73 C561.97,367.68 552.04,377.34 550.26,379.20 L 547.02 382.57 L 617.01 452.46 C655.50,490.90 687.00,522.46 687.00,522.59 C687.00,522.72 685.09,523.91 682.75,525.22 C680.41,526.54 670.85,532.05 661.50,537.46 C596.83,574.90 559.99,596.17 550.50,601.58 L 539.50 607.84 L 539.25 448.42 C539.03,313.95 538.78,289.00 537.62,289.00 C536.23,289.00 535.08,289.44 520.50,295.48 C516.10,297.30 504.51,302.05 494.75,306.04 L 477.00 313.28 ZM 460.00 444.22 L 470.50 448.52 L 470.75 434.01 C471.40,395.74 471.44,365.02 470.84,365.25 C470.47,365.39 456.83,378.52 440.53,394.44 L 410.89 423.39 L 413.70 424.86 C415.24,425.67 420.10,427.78 424.50,429.56 C428.90,431.33 436.33,434.39 441.00,436.35 C445.67,438.31 454.23,441.85 460.00,444.22 Z" fill="#ffffff"/>
+                    </svg>
+                </div>
+
+                <!-- RIGHT — Text Content -->
+                <div class="lg:w-1/2 text-center lg:text-left flex flex-col items-center lg:items-start">
+                    <h1 class="font-heading text-5xl md:text-7xl lg:text-8xl font-bold leading-none mb-6 tracking-tighter text-white">
+                        KUSOG<br>LUZON<br>CONFERENCE<br>
+                        <span class="text-white/50">2026</span>
+                    </h1>
+                    <p class="text-lg md:text-2xl italic font-light mb-10 border-l-4 border-white/60 pl-5 text-white/80">
+                        Building Men of Valor and Service
+                    </p>
+                    <a href="#register" class="bg-white text-kusog-dark font-heading font-bold text-lg px-10 py-4 rounded shadow-lg shadow-black/40 hover:bg-gray-100 transition-all transform hover:scale-105 uppercase tracking-wider">
+                        Join the Movement
+                    </a>
+                </div>
+
             </div>
-          </div>
-          <div class="price-box prem">
-            <div class="price-box-head">Premium</div>
-            <div class="price-input-wrap">
-              <span class="price-symbol">&#8369;</span>
-              <input type="number" id="premium" step="0.01" min="1" max="999" placeholder="0.00"/>
+        </div>
+    </section>
+
+    <!-- RECAP -->
+    <section id="recap" class="py-24 bg-gray-50">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="font-heading text-4xl md:text-6xl font-bold text-kusog-dark mb-6 leading-tight">KUSOG 2025 Conference Highlights</h2>
+            <p class="text-gray-500 text-lg font-light mb-12 max-w-2xl mx-auto leading-relaxed">
+                Watch how God moved among men in our last gathering, stories of strength, renewal, and purpose rediscovered.
+            </p>
+            <div class="relative w-full rounded-xl overflow-hidden shadow-xl border border-gray-200" style="padding-bottom: 56.25%;">
+                <iframe class="absolute inset-0 w-full h-full"
+                    src="https://www.youtube.com/embed/mW52Jf4Guw8?si=7JGdPk2yHyOCIuj4"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
+                </iframe>
             </div>
-          </div>
         </div>
-        <div class="err-msg" id="priceErr">At least one fuel price is required.</div>
+    </section>
 
-        <div class="section-head" style="margin-top:20px">Price Effectivity <span class="req">*</span></div>
-        <div class="form-field">
-          <input type="datetime-local" id="priceDate" required/>
-          <div class="hint">Date and time when the price adjustment took effect.</div>
-          <div class="err-msg" id="dateErr">Please select the date and time.</div>
+    <!-- ABOUT -->
+    <section id="about" class="py-24 bg-white">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="font-heading text-5xl md:text-7xl font-bold mb-6 text-kusog-dark">/ku·sog/</h2>
+            <p class="text-xl md:text-2xl font-light italic text-gray-500">
+                "is a Cebuano word that means 'strength', 'power', or 'inner resilience'"
+            </p>
         </div>
+    </section>
 
-        <div class="section-head" style="margin-top:20px">Reported By <span class="req">*</span></div>
-        <div class="form-field">
-          <input type="text" id="reporter" placeholder="Full name and position of station representative" required/>
-          <div class="err-msg" id="reporterErr">Reporter name is required.</div>
+    <!-- MISSION -->
+    <section id="mission" class="py-24 bg-kusog-dark">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="font-heading text-4xl font-bold mb-10 text-white/40 tracking-widest uppercase">Our Mission</h2>
+            <p class="text-2xl md:text-4xl lg:text-5xl font-heading leading-tight text-white">
+                Kusog is a ministry, a mission, and a movement reaching men, strengthening marriages, and restoring families in this nation and beyond.
+            </p>
         </div>
+    </section>
 
-        <div class="section-head" style="margin-top:20px">Remarks <span style="color:var(--muted);font-weight:400;font-size:9px;letter-spacing:1px">OPTIONAL</span></div>
-        <div class="form-field">
-          <textarea id="remarks" placeholder="Additional notes, DOE advisory reference, etc."></textarea>
+    <!-- REGISTER -->
+    <section id="register" class="py-24 bg-gray-50">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white p-8 md:p-12 rounded-xl border border-gray-200 shadow-lg">
+                <h2 class="font-heading text-4xl font-bold mb-2 text-kusog-dark">Conference Registration</h2>
+                <p class="mb-8 text-gray-400 text-sm">Secure your spot for the 2026 conference. Updates and schedules will be sent to your email.</p>
+                <form id="registrationForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 uppercase tracking-wider text-kusog-dark">Full Name</label>
+                            <input type="text" required class="w-full bg-gray-50 border border-gray-300 rounded px-4 py-3 text-kusog-dark focus:outline-none focus:border-kusog-dark transition placeholder-gray-400" placeholder="Juan Dela Cruz">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 uppercase tracking-wider text-kusog-dark">Email Address</label>
+                            <input type="email" required class="w-full bg-gray-50 border border-gray-300 rounded px-4 py-3 text-kusog-dark focus:outline-none focus:border-kusog-dark transition placeholder-gray-400" placeholder="juan@example.com">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 uppercase tracking-wider text-kusog-dark">Contact Number</label>
+                            <input type="tel" required class="w-full bg-gray-50 border border-gray-300 rounded px-4 py-3 text-kusog-dark focus:outline-none focus:border-kusog-dark transition placeholder-gray-400" placeholder="+63 900 000 0000">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 uppercase tracking-wider text-kusog-dark">Church / Organization</label>
+                            <input type="text" class="w-full bg-gray-50 border border-gray-300 rounded px-4 py-3 text-kusog-dark focus:outline-none focus:border-kusog-dark transition placeholder-gray-400" placeholder="Optional">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full mt-6 bg-kusog-dark text-white font-heading font-bold text-xl px-8 py-4 rounded hover:bg-kusog-mid transition-all uppercase tracking-wider">
+                        Submit Registration
+                    </button>
+                    <p id="successMessage" class="hidden text-green-600 text-center mt-4 font-semibold">Registration successful! We will be in touch.</p>
+                </form>
+            </div>
         </div>
+    </section>
 
-        <div class="divider"></div>
-        <button type="submit" class="btn-submit">Submit Price Report</button>
-      </form>
-    </div>
-    <div class="success-pane" id="successPane">
-      <div class="success-check">
-        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-      </div>
-      <div class="success-title">Report Submitted</div>
-      <div class="success-sub" id="successDetail"></div>
-      <div class="btn-row">
-        <button class="btn-danger" onclick="downloadMyPDF()">Download PDF Receipt</button>
-        <button class="btn-outline" onclick="resetForm()">Submit Another</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ADMIN PANEL -->
-<div class="admin-wrap" id="adminWrap">
-  <div class="admin-panel">
-    <div class="admin-header">
-      <div class="admin-header-left">
-        <div>
-          <div class="admin-title">Price Monitoring Dashboard</div>
-          <div class="admin-subtitle">Municipal Government of Mariveles &mdash; LGU Administrator</div>
+    <!-- FOOTER -->
+    <footer class="bg-kusog-dark py-12 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-4 opacity-70 hover:opacity-100 transition">
+                <svg class="h-8 w-8" viewBox="150 90 620 560" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M 477.00 476.64 C477.00,607.21 476.75,640.00 475.74,640.00 C475.05,640.00 466.61,635.45 456.99,629.90 C447.37,624.34 433.20,616.17 425.50,611.73 C417.80,607.30 406.33,600.66 400.00,596.98 C380.16,585.45 369.01,578.99 352.50,569.48 C323.64,552.86 310.71,545.39 295.66,536.63 C287.50,531.88 280.63,528.00 280.39,528.00 C280.15,528.00 277.15,526.27 273.73,524.15 C270.30,522.03 261.76,517.03 254.75,513.03 L 242.00 505.76 L 242.00 369.13 L 242.01 232.50 L 254.75 225.23 C261.76,221.23 272.00,215.35 277.50,212.15 C283.00,208.95 296.73,201.00 308.00,194.48 C319.27,187.96 333.90,179.51 340.50,175.69 C347.10,171.87 363.08,162.68 376.00,155.26 C388.92,147.84 401.56,140.47 404.09,138.88 C406.61,137.30 409.20,136.00 409.84,136.00 C410.72,136.00 411.01,170.26 411.05,275.75 L 411.09 415.50 L 471.00 354.52 L 471.00 99.97 L 475.33 97.87 L 479.65 95.77 L 486.58 99.71 C495.23,104.64 510.75,113.67 518.00,117.99 C521.03,119.79 526.88,123.16 531.00,125.47 C535.12,127.78 548.17,135.30 560.00,142.17 C571.83,149.05 592.08,160.77 605.00,168.22 C641.98,189.53 643.00,190.14 643.00,190.84 C643.00,191.21 620.74,213.76 593.54,240.96 L 544.08 290.41 L 544.02 332.71 C543.99,355.97 544.31,375.00 544.74,375.00 C545.17,375.00 579.71,340.80 621.49,299.00 C663.27,257.20 698.03,223.00 698.75,223.00 C699.46,223.00 703.64,225.09 708.02,227.63 L 716.00 232.27 L 716.00 347.63 C716.00,411.09 715.66,463.00 715.25,463.00 C714.84,463.00 686.75,435.24 652.82,401.32 L 591.13 339.64 L 572.32 357.73 C561.97,367.68 552.04,377.34 550.26,379.20 L 547.02 382.57 L 617.01 452.46 C655.50,490.90 687.00,522.46 687.00,522.59 C687.00,522.72 685.09,523.91 682.75,525.22 C680.41,526.54 670.85,532.05 661.50,537.46 C596.83,574.90 559.99,596.17 550.50,601.58 L 539.50 607.84 L 539.25 448.42 C539.03,313.95 538.78,289.00 537.62,289.00 C536.23,289.00 535.08,289.44 520.50,295.48 C516.10,297.30 504.51,302.05 494.75,306.04 L 477.00 313.28 ZM 460.00 444.22 L 470.50 448.52 L 470.75 434.01 C471.40,395.74 471.44,365.02 470.84,365.25 C470.47,365.39 456.83,378.52 440.53,394.44 L 410.89 423.39 L 413.70 424.86 C415.24,425.67 420.10,427.78 424.50,429.56 C428.90,431.33 436.33,434.39 441.00,436.35 C445.67,438.31 454.23,441.85 460.00,444.22 Z" fill="#ffffff"/>
+                </svg>
+                <span class="font-heading font-bold tracking-widest text-lg text-white">KUSOG NATION</span>
+            </div>
+            <p class="text-sm text-white/40 text-center md:text-right">&copy; 2026 Kusog Luzon Conference. All rights reserved.<br>Building Men of Valor and Service.</p>
         </div>
-      </div>
-      <button class="btn-link" onclick="doAdminLogout()">Sign out</button>
-    </div>
-    <div class="admin-body">
+    </footer>
 
-      <!-- Summary -->
-      <div class="summary-strip">
-        <div class="summary-cell d">
-          <div class="summary-fuel">Diesel</div>
-          <div class="summary-stat lo"><span>Lowest</span><span id="sd-lo">—</span></div>
-          <div class="summary-stat hi"><span>Highest</span><span id="sd-hi">—</span></div>
-          <div class="summary-stat"><span>Average</span><span id="sd-av">—</span></div>
-        </div>
-        <div class="summary-cell u">
-          <div class="summary-fuel">Unleaded</div>
-          <div class="summary-stat lo"><span>Lowest</span><span id="su-lo">—</span></div>
-          <div class="summary-stat hi"><span>Highest</span><span id="su-hi">—</span></div>
-          <div class="summary-stat"><span>Average</span><span id="su-av">—</span></div>
-        </div>
-        <div class="summary-cell p">
-          <div class="summary-fuel">Premium</div>
-          <div class="summary-stat lo"><span>Lowest</span><span id="sp-lo">—</span></div>
-          <div class="summary-stat hi"><span>Highest</span><span id="sp-hi">—</span></div>
-          <div class="summary-stat"><span>Average</span><span id="sp-av">—</span></div>
-        </div>
-      </div>
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
 
-      <!-- Table -->
-      <div class="table-header">
-        <div class="table-title">Station Price Submissions</div>
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <div class="updated-badge" id="updatedBadge">No submissions yet</div>
-          <button class="btn-pdf" id="btnPdf" onclick="downloadAdminPDF()" disabled>Download PDF</button>
-        </div>
-      </div>
-      <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Station</th>
-              <th>Diesel</th>
-              <th>Unleaded</th>
-              <th>Premium</th>
-              <th>Effectivity</th>
-              <th>Reporter</th>
-            </tr>
-          </thead>
-          <tbody id="priceTableBody">
-            <tr><td colspan="6" class="no-data">Awaiting price submissions from stations.</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<div class="site-footer">
-  <strong>Municipal Government of Mariveles</strong> &mdash; Bataan, Philippines<br>
-  Fuel Price Monitoring Program &middot; Official Use Only
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
-const APPS_URL = "https://script.google.com/macros/s/AKfycbzY8kZBb0S5UKZwt_j3WC_kPpqdSEtdO4HhHhJKp7WqLPES3hEVXzXChO3f95OOBqbe/exec";
-const SEAL_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAA";
-let currentUser = null;
-let lastSub = null;
-let submissions = {};
-let adminRefreshInterval = null;
-
-// ── SESSION PERSISTENCE ──
-function saveSession(user) {
-  const sess = { user, ts: Date.now() };
-  localStorage.setItem('mfpm_session', JSON.stringify(sess));
-}
-function loadSession() {
-  try {
-    const raw = localStorage.getItem('mfpm_session');
-    if (!raw) return null;
-    const sess = JSON.parse(raw);
-    if (Date.now() - sess.ts > 8 * 60 * 60 * 1000) { clearSession(); return null; }
-    return sess.user;
-  } catch { return null; }
-}
-function clearSession() { localStorage.removeItem('mfpm_session'); }
-
-// ── INIT ──
-window.addEventListener('DOMContentLoaded', () => {
-  setNow();
-  const saved = loadSession();
-  if (saved) {
-    currentUser = saved;
-    if (saved.isAdmin) {
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('formScreen').classList.remove('show');
-      showAdminPanel();
-    } else {
-      document.getElementById('loginScreen').style.display = 'none';
-      showForm();
-    }
-    return;
-  }
-  const p = new URLSearchParams(location.search);
-  if (p.get('admin') === 'true') {
-    document.getElementById('loginScreen').style.display = 'block';
-  }
-});
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none'
-      && !document.getElementById('adminWrap').classList.contains('show')) doLogin();
-});
-['username','password'].forEach(id => {
-  document.getElementById(id).addEventListener('input', () => {
-    document.getElementById('loginAlert').classList.remove('show');
-    document.getElementById(id).classList.remove('err');
-    const btn = document.getElementById('btnLogin');
-    btn.disabled = false; btn.textContent = 'Sign In';
-  });
-});
-
-function setNow() {
-  const n = new Date(); n.setMinutes(n.getMinutes() - n.getTimezoneOffset());
-  document.getElementById('priceDate').value = n.toISOString().slice(0,16);
-}
-function togglePw() {
-  const inp = document.getElementById('password');
-  const btn = document.getElementById('pwToggle');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-  btn.textContent = inp.type === 'password' ? 'Show' : 'Hide';
-}
-
-// ── LOGIN ──
-function doLogin() {
-  const uname = document.getElementById('username').value.trim().toLowerCase();
-  const pw = document.getElementById('password').value;
-  const btn = document.getElementById('btnLogin');
-  const alert = document.getElementById('loginAlert');
-  if (!uname || !pw) {
-    alert.textContent = 'Please enter your username and password.';
-    alert.classList.add('show'); return;
-  }
-  btn.disabled = true; btn.textContent = 'Verifying...';
-  alert.classList.remove('show');
-  const old = document.getElementById('loginScript');
-  if (old) old.remove();
-  const cbName = 'cb' + Date.now();
-  const timer = setTimeout(() => {
-    delete window[cbName];
-    const s = document.getElementById('loginScript'); if(s) s.remove();
-    alert.textContent = 'Connection timeout. Please try again.';
-    alert.classList.add('show');
-    btn.disabled = false; btn.textContent = 'Sign In';
-  }, 12000);
-  window[cbName] = function(data) {
-    clearTimeout(timer); delete window[cbName];
-    const s = document.getElementById('loginScript'); if(s) s.remove();
-    if (data && data.result === 'success') {
-      currentUser = { username: uname, name: data.name, location: data.location, isAdmin: !!data.isAdmin };
-      saveSession(currentUser);
-      if (data.isAdmin) { showAdminPanel(); return; }
-      showForm();
-    } else {
-      alert.textContent = 'Incorrect username or password.';
-      alert.classList.add('show');
-      ['username','password'].forEach(id => document.getElementById(id).classList.add('err'));
-      btn.disabled = false; btn.textContent = 'Sign In';
-    }
-  };
-  const script = document.createElement('script');
-  script.id = 'loginScript';
-  script.src = APPS_URL + '?action=login&username=' + encodeURIComponent(uname) + '&password=' + encodeURIComponent(pw) + '&callback=' + cbName;
-  script.onerror = () => {
-    clearTimeout(timer); delete window[cbName];
-    alert.textContent = 'Network error. Please check your connection.';
-    alert.classList.add('show');
-    btn.disabled = false; btn.textContent = 'Sign In';
-  };
-  document.head.appendChild(script);
-}
-
-// ── SHOW FORM ──
-function showForm() {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('formScreen').classList.add('show');
-  document.getElementById('panelLabel').textContent = 'Price Submission';
-  document.getElementById('loggedInAs').textContent = currentUser.name;
-  document.getElementById('lockName').textContent = currentUser.name;
-  document.getElementById('lockLoc').textContent = currentUser.location;
-  document.getElementById('stationPill').textContent = currentUser.name;
-  document.getElementById('stationPill').classList.add('show');
-  setNow();
-}
-
-function doLogout() {
-  clearSession(); currentUser = null; lastSub = null;
-  document.getElementById('formScreen').classList.remove('show');
-  document.getElementById('loginScreen').style.display = 'block';
-  document.getElementById('panelLabel').textContent = 'Station Authentication';
-  document.getElementById('stationPill').classList.remove('show');
-  document.getElementById('username').value = '';
-  document.getElementById('password').value = '';
-  document.getElementById('formBody').style.display = '';
-  document.getElementById('successPane').classList.remove('show');
-  document.querySelectorAll('.err-msg').forEach(e => e.classList.remove('show'));
-  document.querySelectorAll('.err').forEach(e => e.classList.remove('err'));
-  const btn = document.getElementById('btnLogin');
-  btn.disabled = false;
-  btn.textContent = 'Sign In';
-}
-
-// ── ADMIN PANEL ──
-function showAdminPanel() {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('mainPanel').style.display = 'none';
-  document.getElementById('adminWrap').classList.add('show');
-  document.getElementById('panelLabel').textContent = 'Admin Dashboard';
-  
-  loadAdminData();
-  
-  if (adminRefreshInterval) clearInterval(adminRefreshInterval);
-  adminRefreshInterval = setInterval(loadAdminData, 30000);
-}
-
-function loadAdminData() {
-  const cbName = 'adminCb' + Date.now();
-  const timer = setTimeout(() => {
-    delete window[cbName];
-    const s = document.getElementById('dataScript');
-    if (s) s.remove();
-  }, 12000);
-
-  window[cbName] = function(data) {
-    clearTimeout(timer);
-    delete window[cbName];
-    const s = document.getElementById('dataScript');
-    if (s) s.remove();
-
-    if (data && data.result === 'success') {
-      updateAdminTable(data.submissions || []);
-      updateSummaryStats(data.submissions || []);
-    }
-  };
-
-  const script = document.createElement('script');
-  script.id = 'dataScript';
-  script.src = APPS_URL + '?action=getdata&callback=' + cbName;
-  script.onerror = () => {
-    clearTimeout(timer);
-    delete window[cbName];
-  };
-  document.head.appendChild(script);
-}
-
-function updateAdminTable(submissions) {
-  const tbody = document.getElementById('priceTableBody');
-  
-  if (!submissions || submissions.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="no-data">Awaiting price submissions from stations.</td></tr>';
-    document.getElementById('btnPdf').disabled = true;
-    document.getElementById('updatedBadge').textContent = 'No submissions yet';
-    return;
-  }
-
-  let html = '';
-  submissions.forEach(sub => {
-    const ts = new Date(sub.timestamp);
-    const timeStr = ts.toLocaleString('en-PH', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-
-    html += '<tr>' +
-      '<td><div class="stn-name">' + escapeHtml(sub.station) + '</div><div class="stn-loc">' + escapeHtml(sub.location) + '</div></td>' +
-      '<td><span class="price-val">' + formatPrice(sub.diesel) + '</span></td>' +
-      '<td><span class="price-val">' + formatPrice(sub.unleaded) + '</span></td>' +
-      '<td><span class="price-val">' + formatPrice(sub.premium) + '</span></td>' +
-      '<td><span class="time-val">' + timeStr + '</span></td>' +
-      '<td>' + escapeHtml(sub.reporter) + '</td>' +
-      '</tr>';
-  });
-
-  tbody.innerHTML = html;
-  document.getElementById('btnPdf').disabled = false;
-  
-  const lastSub = submissions[0];
-  const lastTs = new Date(lastSub.timestamp);
-  const now = new Date();
-  const diff = Math.floor((now - lastTs) / 1000);
-  let timeAgo = '';
-  
-  if (diff < 60) timeAgo = 'Just now';
-  else if (diff < 3600) timeAgo = Math.floor(diff / 60) + ' min ago';
-  else if (diff < 86400) timeAgo = Math.floor(diff / 3600) + ' hr ago';
-  else timeAgo = Math.floor(diff / 86400) + ' days ago';
-  
-  document.getElementById('updatedBadge').textContent = 'Latest: ' + timeAgo;
-}
-
-function updateSummaryStats(submissions) {
-  if (!submissions || submissions.length === 0) return;
-
-  const diesel = submissions.map(s => parseFloat(s.diesel)).filter(v => v > 0);
-  const unleaded = submissions.map(s => parseFloat(s.unleaded)).filter(v => v > 0);
-  const premium = submissions.map(s => parseFloat(s.premium)).filter(v => v > 0);
-
-  updateFuelStats('d', diesel);
-  updateFuelStats('u', unleaded);
-  updateFuelStats('p', premium);
-}
-
-function updateFuelStats(fuelType, prices) {
-  if (prices.length === 0) {
-    document.getElementById('s' + fuelType + '-lo').textContent = '—';
-    document.getElementById('s' + fuelType + '-hi').textContent = '—';
-    document.getElementById('s' + fuelType + '-av').textContent = '—';
-    return;
-  }
-
-  const lo = Math.min(...prices);
-  const hi = Math.max(...prices);
-  const av = (prices.reduce((a, b) => a + b, 0) / prices.length).toFixed(2);
-
-  document.getElementById('s' + fuelType + '-lo').textContent = '₱' + lo.toFixed(2);
-  document.getElementById('s' + fuelType + '-hi').textContent = '₱' + hi.toFixed(2);
-  document.getElementById('s' + fuelType + '-av').textContent = '₱' + av;
-}
-
-function formatPrice(val) {
-  if (!val || val === '' || parseFloat(val) <= 0) return 'N/A';
-  return '₱' + parseFloat(val).toFixed(2);
-}
-
-function escapeHtml(text) {
-  if (!text) return '';
-  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-  return String(text).replace(/[&<>"']/g, m => map[m]);
-}
-
-function doAdminLogout() {
-  if (adminRefreshInterval) clearInterval(adminRefreshInterval);
-  clearSession();
-  currentUser = null;
-  document.getElementById('adminWrap').classList.remove('show');
-  document.getElementById('mainPanel').style.display = 'block';
-  document.getElementById('loginScreen').style.display = 'block';
-  document.getElementById('panelLabel').textContent = 'Station Authentication';
-  document.getElementById('username').value = '';
-  document.getElementById('password').value = '';
-  const btn = document.getElementById('btnLogin');
-  btn.disabled = false;
-  btn.textContent = 'Sign In';
-}
-
-function downloadAdminPDF() {
-  const tbody = document.getElementById('priceTableBody');
-  const firstRow = tbody.querySelector('tr');
-  if (!firstRow || !firstRow.querySelector('.stn-name')) return;
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  
-  doc.setFontSize(18);
-  doc.text('Fuel Price Monitoring Report', 14, 15);
-  doc.setFontSize(10);
-  doc.text('Municipal Government of Mariveles', 14, 22);
-  doc.text('Date: ' + new Date().toLocaleDateString('en-PH'), 14, 28);
-  
-  const headers = ['Station', 'Diesel', 'Unleaded', 'Premium', 'Reporter', 'Time'];
-  const rows = [];
-  
-  document.querySelectorAll('#priceTableBody tr').forEach(tr => {
-    const cells = tr.querySelectorAll('td');
-    if (cells.length === 6 && cells[0].querySelector('.stn-name')) {
-      rows.push([
-        cells[0].querySelector('.stn-name').textContent,
-        cells[1].textContent.trim(),
-        cells[2].textContent.trim(),
-        cells[3].textContent.trim(),
-        cells[5].textContent.trim(),
-        cells[4].textContent.trim()
-      ]);
-    }
-  });
-
-  if (window.jspdf && window.jspdf.jsPDF && typeof window.jspdf.jsPDF.autoTableSetDefaults === 'function') {
-    doc.autoTable({
-      head: [headers],
-      body: rows,
-      startY: 35,
-      theme: 'grid',
-      margin: { left: 14, right: 14 }
-    });
-  }
-
-  doc.save('fuel-prices-' + new Date().toISOString().split('T')[0] + '.pdf');
-}
-
-// ── FORM SUBMISSION ──
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('priceForm');
-  if (form) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      submitPrice();
-    });
-  }
-});
-
-function submitPrice() {
-  const d = parseFloat(document.getElementById('diesel').value) || 0;
-  const u = parseFloat(document.getElementById('unleaded').value) || 0;
-  const p = parseFloat(document.getElementById('premium').value) || 0;
-  const priceDate = document.getElementById('priceDate').value;
-  const reporter = document.getElementById('reporter').value.trim();
-  const remarks = document.getElementById('remarks').value.trim();
-
-  let valid = true;
-  document.querySelectorAll('.err-msg').forEach(e => e.classList.remove('show'));
-
-  if (d <= 0 && u <= 0 && p <= 0) {
-    document.getElementById('priceErr').classList.add('show');
-    valid = false;
-  }
-  if (!priceDate) {
-    document.getElementById('dateErr').classList.add('show');
-    valid = false;
-  }
-  if (!reporter) {
-    document.getElementById('reporterErr').classList.add('show');
-    valid = false;
-  }
-
-  if (!valid) return;
-
-  const data = {
-    action: 'submit',
-    timestamp: new Date(priceDate).toISOString(),
-    station: currentUser.name,
-    location: currentUser.location,
-    username: currentUser.username,
-    diesel: d > 0 ? d : '',
-    unleaded: u > 0 ? u : '',
-    premium: p > 0 ? p : '',
-    reporter: reporter,
-    remarks: remarks
-  };
-
-  fetch(APPS_URL, {
-    method: 'POST',
-    body: JSON.stringify(data)
-  })
-  .then(r => r.json())
-  .then(res => {
-    if (res.result === 'success') {
-      lastSub = data;
-      document.getElementById('formBody').style.display = 'none';
-      document.getElementById('successPane').classList.add('show');
-      document.getElementById('successDetail').textContent = 
-        'Your price report for ' + currentUser.name + ' has been submitted successfully.';
-    }
-  })
-  .catch(err => console.error('Submit error:', err));
-}
-
-function resetForm() {
-  document.getElementById('priceForm').reset();
-  setNow();
-  document.getElementById('successPane').classList.remove('show');
-  document.getElementById('formBody').style.display = '';
-  document.querySelectorAll('.err-msg').forEach(e => e.classList.remove('show'));
-}
-
-function downloadMyPDF() {
-  if (!lastSub) return;
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  
-  doc.setFontSize(18);
-  doc.text('Price Report Receipt', 14, 15);
-  doc.setFontSize(10);
-  doc.text('Municipal Government of Mariveles', 14, 22);
-  
-  const y = 35;
-  doc.text('Station: ' + lastSub.station, 14, y);
-  doc.text('Location: ' + lastSub.location, 14, y + 8);
-  doc.text('Reporter: ' + lastSub.reporter, 14, y + 16);
-  doc.text('Submitted: ' + new Date(lastSub.timestamp).toLocaleString('en-PH'), 14, y + 24);
-  
-  doc.text('Prices:', 14, y + 35);
-  doc.text('Diesel: ' + (lastSub.diesel || 'N/A'), 20, y + 43);
-  doc.text('Unleaded: ' + (lastSub.unleaded || 'N/A'), 20, y + 51);
-  doc.text('Premium: ' + (lastSub.premium || 'N/A'), 20, y + 59);
-  
-  if (lastSub.remarks) {
-    doc.text('Remarks: ' + lastSub.remarks, 20, y + 70);
-  }
-  
-  doc.save('receipt-' + new Date().toISOString().split('T')[0] + '.pdf');
-}
-</script>
+            e.preventDefault();
+            this.reset();
+            const msg = document.getElementById('successMessage');
+            msg.classList.remove('hidden');
+            setTimeout(() => { msg.classList.add('hidden'); }, 5000);
+        });
+    </script>
 </body>
 </html>
+
