@@ -24,17 +24,32 @@
     <style>
         /* ── Hero background ── */
         .hero-bg {
-            background: linear-gradient(rgba(26,28,24,0.82), rgba(26,28,24,0.93)),
+            background: linear-gradient(rgba(0,0,0,0.92), rgba(0,0,0,0.96)),
                         url('https://images.unsplash.com/photo-1483726234545-481d6e7c10b2?q=80&w=2000&auto=format&fit=crop') center/cover;
-            background-attachment: scroll; /* fixed breaks on iOS Safari */
+            background-attachment: scroll;
         }
 
-        /* ── Logo float ── */
+        /* ── Metallic shine sweep West → East ── */
+        @keyframes metalShine {
+            0%   { stop-color: #ffffff; stop-opacity: 0; }
+            50%  { stop-color: #ffffff; stop-opacity: 1; }
+            100% { stop-color: #ffffff; stop-opacity: 0; }
+        }
+        @keyframes sweepX {
+            0%   { x: -120%; }
+            100% { x: 120%; }
+        }
         @keyframes floatLogo {
             0%, 100% { transform: translateY(0px); }
-            50%       { transform: translateY(-14px); }
+            50%       { transform: translateY(-10px); }
         }
-        .logo-float { animation: floatLogo 5s ease-in-out infinite; }
+        .logo-wrap {
+            animation: floatLogo 5s ease-in-out infinite;
+            position: relative;
+        }
+        .shine-rect {
+            animation: sweepX 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
 
         /* ── Fade up on scroll ── */
         .fade-up {
@@ -214,20 +229,114 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-12 lg:py-0">
             <div class="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-0">
 
-                <!-- LEFT — Giant Logo -->
-                <div class="flex-shrink-0 flex items-center justify-center lg:justify-start lg:w-1/2">
-                    <svg class="logo-float w-[220px] h-[220px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px] lg:w-[520px] lg:h-[520px]"
-                         style="filter: drop-shadow(0 0 60px rgba(255,255,255,0.10));"
+                <!-- LEFT — 3D Chrome Beveled Logo -->
+                <div class="logo-wrap flex-shrink-0 flex items-center justify-center lg:justify-start lg:w-1/2">
+                    <svg class="w-[220px] h-[220px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px] lg:w-[520px] lg:h-[520px]"
                          viewBox="150 90 620 560" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M 477.00 476.64 C477.00,607.21 476.75,640.00 475.74,640.00 C475.05,640.00 466.61,635.45 456.99,629.90 C447.37,624.34 433.20,616.17 425.50,611.73 C417.80,607.30 406.33,600.66 400.00,596.98 C380.16,585.45 369.01,578.99 352.50,569.48 C323.64,552.86 310.71,545.39 295.66,536.63 C287.50,531.88 280.63,528.00 280.39,528.00 C280.15,528.00 277.15,526.27 273.73,524.15 C270.30,522.03 261.76,517.03 254.75,513.03 L 242.00 505.76 L 242.00 369.13 L 242.01 232.50 L 254.75 225.23 C261.76,221.23 272.00,215.35 277.50,212.15 C283.00,208.95 296.73,201.00 308.00,194.48 C319.27,187.96 333.90,179.51 340.50,175.69 C347.10,171.87 363.08,162.68 376.00,155.26 C388.92,147.84 401.56,140.47 404.09,138.88 C406.61,137.30 409.20,136.00 409.84,136.00 C410.72,136.00 411.01,170.26 411.05,275.75 L 411.09 415.50 L 471.00 354.52 L 471.00 99.97 L 475.33 97.87 L 479.65 95.77 L 486.58 99.71 C495.23,104.64 510.75,113.67 518.00,117.99 C521.03,119.79 526.88,123.16 531.00,125.47 C535.12,127.78 548.17,135.30 560.00,142.17 C571.83,149.05 592.08,160.77 605.00,168.22 C641.98,189.53 643.00,190.14 643.00,190.84 C643.00,191.21 620.74,213.76 593.54,240.96 L 544.08 290.41 L 544.02 332.71 C543.99,355.97 544.31,375.00 544.74,375.00 C545.17,375.00 579.71,340.80 621.49,299.00 C663.27,257.20 698.03,223.00 698.75,223.00 C699.46,223.00 703.64,225.09 708.02,227.63 L 716.00 232.27 L 716.00 347.63 C716.00,411.09 715.66,463.00 715.25,463.00 C714.84,463.00 686.75,435.24 652.82,401.32 L 591.13 339.64 L 572.32 357.73 C561.97,367.68 552.04,377.34 550.26,379.20 L 547.02 382.57 L 617.01 452.46 C655.50,490.90 687.00,522.46 687.00,522.59 C687.00,522.72 685.09,523.91 682.75,525.22 C680.41,526.54 670.85,532.05 661.50,537.46 C596.83,574.90 559.99,596.17 550.50,601.58 L 539.50 607.84 L 539.25 448.42 C539.03,313.95 538.78,289.00 537.62,289.00 C536.23,289.00 535.08,289.44 520.50,295.48 C516.10,297.30 504.51,302.05 494.75,306.04 L 477.00 313.28 ZM 460.00 444.22 L 470.50 448.52 L 470.75 434.01 C471.40,395.74 471.44,365.02 470.84,365.25 C470.47,365.39 456.83,378.52 440.53,394.44 L 410.89 423.39 L 413.70 424.86 C415.24,425.67 420.10,427.78 424.50,429.56 C428.90,431.33 436.33,434.39 441.00,436.35 C445.67,438.31 454.23,441.85 460.00,444.22 Z" fill="#ffffff"/>
+                        <defs>
+
+                            <!-- EXACT SAME SILVER GRADIENT AS 2026 — vertical top to bottom -->
+                            <linearGradient id="chromeFace" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%"   stop-color="#c0c0c0"/>
+                                <stop offset="15%"  stop-color="#e8e8e8"/>
+                                <stop offset="32%"  stop-color="#ffffff"/>
+                                <stop offset="45%"  stop-color="#ffffff"/>
+                                <stop offset="58%"  stop-color="#d0d0d0"/>
+                                <stop offset="75%"  stop-color="#f0f0f0"/>
+                                <stop offset="88%"  stop-color="#e0e0e0"/>
+                                <stop offset="100%" stop-color="#b8b8b8"/>
+                            </linearGradient>
+
+                            <!-- SHINE — same style as 2026, sharp bright core -->
+                            <linearGradient id="shineSweep" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%"   stop-color="white" stop-opacity="0"/>
+                                <stop offset="38%"  stop-color="white" stop-opacity="0"/>
+                                <stop offset="48%"  stop-color="white" stop-opacity="0.8"/>
+                                <stop offset="50%"  stop-color="white" stop-opacity="0.95"/>
+                                <stop offset="52%"  stop-color="white" stop-opacity="0.8"/>
+                                <stop offset="62%"  stop-color="white" stop-opacity="0"/>
+                                <stop offset="100%" stop-color="white" stop-opacity="0"/>
+                            </linearGradient>
+
+                            <!-- AMBIENT BLOOM -->
+                            <linearGradient id="bloom" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%"   stop-color="white" stop-opacity="0"/>
+                                <stop offset="38%"  stop-color="white" stop-opacity="0"/>
+                                <stop offset="50%"  stop-color="white" stop-opacity="0.28"/>
+                                <stop offset="62%"  stop-color="white" stop-opacity="0"/>
+                                <stop offset="100%" stop-color="white" stop-opacity="0"/>
+                            </linearGradient>
+
+                            <!-- OUTER GLOW FILTER — like the reference image ambient glow -->
+                            <filter id="metalGlow" x="-25%" y="-25%" width="150%" height="150%">
+                                <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+                                <feColorMatrix in="blur" type="matrix"
+                                    values="1 1 1 0 0.2
+                                            1 1 1 0 0.2
+                                            1 1 1 0 0.2
+                                            0 0 0 0.4 0" result="glow"/>
+                                <feMerge>
+                                    <feMergeNode in="glow"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+
+                            <!-- CLIP PATH -->
+                            <clipPath id="kMask">
+                                <path d="M 477.00 476.64 C477.00,607.21 476.75,640.00 475.74,640.00 C475.05,640.00 466.61,635.45 456.99,629.90 C447.37,624.34 433.20,616.17 425.50,611.73 C417.80,607.30 406.33,600.66 400.00,596.98 C380.16,585.45 369.01,578.99 352.50,569.48 C323.64,552.86 310.71,545.39 295.66,536.63 C287.50,531.88 280.63,528.00 280.39,528.00 C280.15,528.00 277.15,526.27 273.73,524.15 C270.30,522.03 261.76,517.03 254.75,513.03 L 242.00 505.76 L 242.00 369.13 L 242.01 232.50 L 254.75 225.23 C261.76,221.23 272.00,215.35 277.50,212.15 C283.00,208.95 296.73,201.00 308.00,194.48 C319.27,187.96 333.90,179.51 340.50,175.69 C347.10,171.87 363.08,162.68 376.00,155.26 C388.92,147.84 401.56,140.47 404.09,138.88 C406.61,137.30 409.20,136.00 409.84,136.00 C410.72,136.00 411.01,170.26 411.05,275.75 L 411.09 415.50 L 471.00 354.52 L 471.00 99.97 L 475.33 97.87 L 479.65 95.77 L 486.58 99.71 C495.23,104.64 510.75,113.67 518.00,117.99 C521.03,119.79 526.88,123.16 531.00,125.47 C535.12,127.78 548.17,135.30 560.00,142.17 C571.83,149.05 592.08,160.77 605.00,168.22 C641.98,189.53 643.00,190.14 643.00,190.84 C643.00,191.21 620.74,213.76 593.54,240.96 L 544.08 290.41 L 544.02 332.71 C543.99,355.97 544.31,375.00 544.74,375.00 C545.17,375.00 579.71,340.80 621.49,299.00 C663.27,257.20 698.03,223.00 698.75,223.00 C699.46,223.00 703.64,225.09 708.02,227.63 L 716.00 232.27 L 716.00 347.63 C716.00,411.09 715.66,463.00 715.25,463.00 C714.84,463.00 686.75,435.24 652.82,401.32 L 591.13 339.64 L 572.32 357.73 C561.97,367.68 552.04,377.34 550.26,379.20 L 547.02 382.57 L 617.01 452.46 C655.50,490.90 687.00,522.46 687.00,522.59 C687.00,522.72 685.09,523.91 682.75,525.22 C680.41,526.54 670.85,532.05 661.50,537.46 C596.83,574.90 559.99,596.17 550.50,601.58 L 539.50 607.84 L 539.25 448.42 C539.03,313.95 538.78,289.00 537.62,289.00 C536.23,289.00 535.08,289.44 520.50,295.48 C516.10,297.30 504.51,302.05 494.75,306.04 L 477.00 313.28 ZM 460.00 444.22 L 470.50 448.52 L 470.75 434.01 C471.40,395.74 471.44,365.02 470.84,365.25 C470.47,365.39 456.83,378.52 440.53,394.44 L 410.89 423.39 L 413.70 424.86 C415.24,425.67 420.10,427.78 424.50,429.56 C428.90,431.33 436.33,434.39 441.00,436.35 C445.67,438.31 454.23,441.85 460.00,444.22 Z"/>
+                            </clipPath>
+
+                        </defs>
+
+                        <!-- LAYER 1: Pure bright silver — no dark shadow -->
+                        <path d="M 477.00 476.64 C477.00,607.21 476.75,640.00 475.74,640.00 C475.05,640.00 466.61,635.45 456.99,629.90 C447.37,624.34 433.20,616.17 425.50,611.73 C417.80,607.30 406.33,600.66 400.00,596.98 C380.16,585.45 369.01,578.99 352.50,569.48 C323.64,552.86 310.71,545.39 295.66,536.63 C287.50,531.88 280.63,528.00 280.39,528.00 C280.15,528.00 277.15,526.27 273.73,524.15 C270.30,522.03 261.76,517.03 254.75,513.03 L 242.00 505.76 L 242.00 369.13 L 242.01 232.50 L 254.75 225.23 C261.76,221.23 272.00,215.35 277.50,212.15 C283.00,208.95 296.73,201.00 308.00,194.48 C319.27,187.96 333.90,179.51 340.50,175.69 C347.10,171.87 363.08,162.68 376.00,155.26 C388.92,147.84 401.56,140.47 404.09,138.88 C406.61,137.30 409.20,136.00 409.84,136.00 C410.72,136.00 411.01,170.26 411.05,275.75 L 411.09 415.50 L 471.00 354.52 L 471.00 99.97 L 475.33 97.87 L 479.65 95.77 L 486.58 99.71 C495.23,104.64 510.75,113.67 518.00,117.99 C521.03,119.79 526.88,123.16 531.00,125.47 C535.12,127.78 548.17,135.30 560.00,142.17 C571.83,149.05 592.08,160.77 605.00,168.22 C641.98,189.53 643.00,190.14 643.00,190.84 C643.00,191.21 620.74,213.76 593.54,240.96 L 544.08 290.41 L 544.02 332.71 C543.99,355.97 544.31,375.00 544.74,375.00 C545.17,375.00 579.71,340.80 621.49,299.00 C663.27,257.20 698.03,223.00 698.75,223.00 C699.46,223.00 703.64,225.09 708.02,227.63 L 716.00 232.27 L 716.00 347.63 C716.00,411.09 715.66,463.00 715.25,463.00 C714.84,463.00 686.75,435.24 652.82,401.32 L 591.13 339.64 L 572.32 357.73 C561.97,367.68 552.04,377.34 550.26,379.20 L 547.02 382.57 L 617.01 452.46 C655.50,490.90 687.00,522.46 687.00,522.59 C687.00,522.72 685.09,523.91 682.75,525.22 C680.41,526.54 670.85,532.05 661.50,537.46 C596.83,574.90 559.99,596.17 550.50,601.58 L 539.50 607.84 L 539.25 448.42 C539.03,313.95 538.78,289.00 537.62,289.00 C536.23,289.00 535.08,289.44 520.50,295.48 C516.10,297.30 504.51,302.05 494.75,306.04 L 477.00 313.28 ZM 460.00 444.22 L 470.50 448.52 L 470.75 434.01 C471.40,395.74 471.44,365.02 470.84,365.25 C470.47,365.39 456.83,378.52 440.53,394.44 L 410.89 423.39 L 413.70 424.86 C415.24,425.67 420.10,427.78 424.50,429.56 C428.90,431.33 436.33,434.39 441.00,436.35 C445.67,438.31 454.23,441.85 460.00,444.22 Z"
+                              fill="url(#chromeFace)" filter="url(#metalGlow)"/>
+
+                        <!-- SHINE: Soft ambient pulse — no diagonal line, just silver glow -->
+                        <g clip-path="url(#kMask)">
+                            <rect x="150" y="90" width="620" height="560" fill="white">
+                                <animate attributeName="opacity" values="0;0.08;0.18;0.08;0" dur="3s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
+                            </rect>
+                        </g>
+
                     </svg>
                 </div>
 
                 <!-- RIGHT — Text Content -->
                 <div class="lg:w-1/2 text-center lg:text-left flex flex-col items-center lg:items-start stagger">
                     <h1 class="fade-up font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-none mb-6 tracking-tighter text-white">
-                        KUSOG<br>LUZON<br>CONFERENCE<br>
-                        <span class="text-white/40">2026</span>
+                        KUSOG<br>BATAAN<br>CONFERENCE<br>
+                        <!-- Metallic shining 2026 -->
+                        <svg class="inline-block" style="height:1em; width:auto; vertical-align:baseline; overflow:visible;" viewBox="0 0 340 100" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="silver2026" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%"   stop-color="#6e6e6e"/>
+                                    <stop offset="20%"  stop-color="#d4d4d4"/>
+                                    <stop offset="45%"  stop-color="#ffffff"/>
+                                    <stop offset="60%"  stop-color="#a8a8a8"/>
+                                    <stop offset="80%"  stop-color="#e0e0e0"/>
+                                    <stop offset="100%" stop-color="#5a5a5a"/>
+                                </linearGradient>
+                                <linearGradient id="shine2026" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%"   stop-color="white" stop-opacity="0"/>
+                                    <stop offset="42%"  stop-color="white" stop-opacity="0"/>
+                                    <stop offset="50%"  stop-color="white" stop-opacity="0.95"/>
+                                    <stop offset="58%"  stop-color="white" stop-opacity="0"/>
+                                    <stop offset="100%" stop-color="white" stop-opacity="0"/>
+                                </linearGradient>
+                                <clipPath id="textClip2026">
+                                    <text x="0" y="92" font-family="Oswald, sans-serif" font-weight="700" font-size="100" letter-spacing="-2">2026</text>
+                                </clipPath>
+                            </defs>
+                            <!-- Base silver text -->
+                            <text x="0" y="92" font-family="Oswald, sans-serif" font-weight="700" font-size="100" letter-spacing="-2" fill="url(#silver2026)">2026</text>
+                            <!-- Shine sweep clipped to text shape -->
+                            <g clip-path="url(#textClip2026)">
+                                <rect y="0" width="120" height="100" fill="url(#shine2026)">
+                                    <animate attributeName="x" from="-120" to="460" dur="2.8s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.2 1"/>
+                                </rect>
+                            </g>
+                        </svg>
                     </h1>
                     <p class="fade-up text-base sm:text-lg md:text-2xl italic font-light mb-8 border-l-4 border-white/50 pl-5 text-white/75">
                         Building Men of Valor and Service
@@ -324,10 +433,10 @@
                 <svg class="h-7 w-7 sm:h-8 sm:w-8" viewBox="150 90 620 560" xmlns="http://www.w3.org/2000/svg">
                     <path d="M 477.00 476.64 C477.00,607.21 476.75,640.00 475.74,640.00 C475.05,640.00 466.61,635.45 456.99,629.90 C447.37,624.34 433.20,616.17 425.50,611.73 C417.80,607.30 406.33,600.66 400.00,596.98 C380.16,585.45 369.01,578.99 352.50,569.48 C323.64,552.86 310.71,545.39 295.66,536.63 C287.50,531.88 280.63,528.00 280.39,528.00 C280.15,528.00 277.15,526.27 273.73,524.15 C270.30,522.03 261.76,517.03 254.75,513.03 L 242.00 505.76 L 242.00 369.13 L 242.01 232.50 L 254.75 225.23 C261.76,221.23 272.00,215.35 277.50,212.15 C283.00,208.95 296.73,201.00 308.00,194.48 C319.27,187.96 333.90,179.51 340.50,175.69 C347.10,171.87 363.08,162.68 376.00,155.26 C388.92,147.84 401.56,140.47 404.09,138.88 C406.61,137.30 409.20,136.00 409.84,136.00 C410.72,136.00 411.01,170.26 411.05,275.75 L 411.09 415.50 L 471.00 354.52 L 471.00 99.97 L 475.33 97.87 L 479.65 95.77 L 486.58 99.71 C495.23,104.64 510.75,113.67 518.00,117.99 C521.03,119.79 526.88,123.16 531.00,125.47 C535.12,127.78 548.17,135.30 560.00,142.17 C571.83,149.05 592.08,160.77 605.00,168.22 C641.98,189.53 643.00,190.14 643.00,190.84 C643.00,191.21 620.74,213.76 593.54,240.96 L 544.08 290.41 L 544.02 332.71 C543.99,355.97 544.31,375.00 544.74,375.00 C545.17,375.00 579.71,340.80 621.49,299.00 C663.27,257.20 698.03,223.00 698.75,223.00 C699.46,223.00 703.64,225.09 708.02,227.63 L 716.00 232.27 L 716.00 347.63 C716.00,411.09 715.66,463.00 715.25,463.00 C714.84,463.00 686.75,435.24 652.82,401.32 L 591.13 339.64 L 572.32 357.73 C561.97,367.68 552.04,377.34 550.26,379.20 L 547.02 382.57 L 617.01 452.46 C655.50,490.90 687.00,522.46 687.00,522.59 C687.00,522.72 685.09,523.91 682.75,525.22 C680.41,526.54 670.85,532.05 661.50,537.46 C596.83,574.90 559.99,596.17 550.50,601.58 L 539.50 607.84 L 539.25 448.42 C539.03,313.95 538.78,289.00 537.62,289.00 C536.23,289.00 535.08,289.44 520.50,295.48 C516.10,297.30 504.51,302.05 494.75,306.04 L 477.00 313.28 ZM 460.00 444.22 L 470.50 448.52 L 470.75 434.01 C471.40,395.74 471.44,365.02 470.84,365.25 C470.47,365.39 456.83,378.52 440.53,394.44 L 410.89 423.39 L 413.70 424.86 C415.24,425.67 420.10,427.78 424.50,429.56 C428.90,431.33 436.33,434.39 441.00,436.35 C445.67,438.31 454.23,441.85 460.00,444.22 Z" fill="#ffffff"/>
                 </svg>
-                <span class="font-heading font-bold tracking-widest text-base sm:text-lg text-white">KUSOG NATION</span>
+                <span class="font-heading font-bold tracking-widest text-base sm:text-lg text-white">KUSOG BATAAN</span>
             </div>
             <p class="text-xs sm:text-sm text-white/30 text-center sm:text-right leading-relaxed">
-                &copy; 2026 Kusog Luzon Conference. All rights reserved.<br>Building Men of Valor and Service.
+                &copy; 2026 Kusog Bataan Conference. All rights reserved.<br>Building Men of Valor and Service.
             </p>
         </div>
     </footer>
@@ -346,7 +455,9 @@
         }
 
         // ── Scroll-triggered fade-up ──
-        function initObserver() {
+        function initAnimations() {
+            const elements = document.querySelectorAll('.fade-up');
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -354,19 +465,22 @@
                         observer.unobserve(entry.target);
                     }
                 });
-            }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+            }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
 
-            document.querySelectorAll('.fade-up').forEach(el => {
-                observer.observe(el);
+            elements.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                // If element is already in viewport on load, show it immediately
+                if (rect.top < window.innerHeight && rect.bottom >= 0) {
+                    setTimeout(() => el.classList.add('visible'), 100);
+                } else {
+                    observer.observe(el);
+                }
             });
         }
 
-        // Run after full page load to ensure layout is complete
-        if (document.readyState === 'complete') {
-            initObserver();
-        } else {
-            window.addEventListener('load', initObserver);
-        }
+        window.addEventListener('load', () => {
+            setTimeout(initAnimations, 50);
+        });
 
         // ── Form submit ──
         document.getElementById('registrationForm').addEventListener('submit', function(e) {
