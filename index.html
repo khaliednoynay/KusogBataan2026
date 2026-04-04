@@ -3,6 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self';
+                   script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://www.youtube.com https://www.gstatic.com;
+                   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+                   font-src https://fonts.gstatic.com;
+                   img-src 'self' data: https://images.unsplash.com https://*.ytimg.com;
+                   connect-src 'self' https://api.emailjs.com;
+                   frame-src https://www.youtube.com https://www.youtube-nocookie.com;
+                   frame-ancestors 'none';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>KUSOG BATAAN CONFERENCE 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
@@ -120,6 +132,17 @@
         }
         .btn-dark:hover::before { left: 150%; }
         .btn-dark:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+
+        /* ── Honeypot (hidden from humans, visible to bots) ── */
+        .hp-field {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            opacity: 0;
+            height: 0;
+            width: 0;
+            z-index: -1;
+        }
 
         /* ── Input focus lift ── */
         .input-field {
@@ -328,8 +351,8 @@
                 Watch how God moved among men in our last gathering, stories of strength, renewal, and purpose rediscovered.
             </p>
             <div class="fade-up video-wrap relative w-full rounded-2xl overflow-hidden shadow-xl border border-gray-200" style="padding-bottom: 56.25%;">
-                <iframe class="absolute inset-0 w-full h-full"
-                    src="https://www.youtube.com/embed/mW52Jf4Guw8?si=7JGdPk2yHyOCIuj4"
+                <iframe id="recap-video" class="absolute inset-0 w-full h-full"
+                    src="https://www.youtube.com/embed/mW52Jf4Guw8?si=7JGdPk2yHyOCIuj4&enablejsapi=1"
                     title="YouTube video player" frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
@@ -361,28 +384,49 @@
             <div class="fade-up bg-white p-6 sm:p-8 md:p-12 rounded-2xl border border-gray-200 shadow-lg">
                 <h2 class="font-heading text-3xl sm:text-4xl font-bold mb-2 text-kusog-dark">Conference Registration</h2>
                 <p class="mb-8 text-gray-400 text-sm">Secure your spot for the 2026 conference. Updates and schedules will be sent to your email.</p>
-                <form id="registrationForm" class="space-y-5">
+                <form id="registrationForm" class="space-y-5" novalidate>
+                    <!-- Honeypot: bots fill this, humans never see it -->
+                    <div class="hp-field" aria-hidden="true">
+                        <label>Leave this empty</label>
+                        <input type="text" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
-                            <label class="block text-xs font-semibold mb-2 uppercase tracking-wider text-kusog-dark">Full Name</label>
-                            <input type="text" required class="input-field w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-kusog-dark placeholder-gray-400" placeholder="Juan Dela Cruz">
+                            <label for="reg-name" class="block text-xs font-semibold mb-2 uppercase tracking-wider text-kusog-dark">Full Name</label>
+                            <input id="reg-name" type="text" name="full_name" required
+                                   minlength="2" maxlength="100"
+                                   pattern="[A-Za-z\u00C0-\u024F\s'\-]{2,100}"
+                                   autocomplete="name"
+                                   class="input-field w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-kusog-dark placeholder-gray-400" placeholder="Juan Dela Cruz">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold mb-2 uppercase tracking-wider text-kusog-dark">Email Address</label>
-                            <input type="email" required class="input-field w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-kusog-dark placeholder-gray-400" placeholder="juan@example.com">
+                            <label for="reg-email" class="block text-xs font-semibold mb-2 uppercase tracking-wider text-kusog-dark">Email Address</label>
+                            <input id="reg-email" type="email" name="email" required
+                                   maxlength="254"
+                                   autocomplete="email"
+                                   class="input-field w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-kusog-dark placeholder-gray-400" placeholder="juan@example.com">
                         </div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
-                            <label class="block text-xs font-semibold mb-2 uppercase tracking-wider text-kusog-dark">Contact Number</label>
-                            <input type="tel" required class="input-field w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-kusog-dark placeholder-gray-400" placeholder="+63 900 000 0000">
+                            <label for="reg-phone" class="block text-xs font-semibold mb-2 uppercase tracking-wider text-kusog-dark">Contact Number</label>
+                            <input id="reg-phone" type="tel" name="phone" required
+                                   minlength="7" maxlength="20"
+                                   pattern="[\+]?[0-9\s\-\(\)]{7,20}"
+                                   autocomplete="tel"
+                                   class="input-field w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-kusog-dark placeholder-gray-400" placeholder="+63 900 000 0000">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold mb-2 uppercase tracking-wider text-kusog-dark">Church / Organization</label>
-                            <input type="text" class="input-field w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-kusog-dark placeholder-gray-400" placeholder="Optional">
+                            <label for="reg-org" class="block text-xs font-semibold mb-2 uppercase tracking-wider text-kusog-dark">Church / Organization</label>
+                            <input id="reg-org" type="text" name="organization"
+                                   maxlength="150"
+                                   autocomplete="organization"
+                                   class="input-field w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-kusog-dark placeholder-gray-400" placeholder="Optional">
                         </div>
                     </div>
-                    <button type="submit" class="btn-dark w-full mt-2 bg-kusog-dark text-white font-heading font-bold text-lg sm:text-xl px-8 py-4 rounded-lg uppercase tracking-wider">
+                    <p id="formError" class="hidden text-red-500 text-sm text-center font-semibold"></p>
+                    <button type="submit" id="submitBtn" class="btn-dark w-full mt-2 bg-kusog-dark text-white font-heading font-bold text-lg sm:text-xl px-8 py-4 rounded-lg uppercase tracking-wider">
                         Submit Registration
                     </button>
                     <p id="successMessage" class="hidden text-green-600 text-center mt-4 font-semibold">Registration successful! We will be in touch.</p>
@@ -446,13 +490,122 @@
             setTimeout(initAnimations, 50);
         });
 
+        // ── YouTube pause-on-scroll ──
+        var ytPlayer = null;
+
+        window.onYouTubeIframeAPIReady = function() {
+            ytPlayer = new YT.Player('recap-video', {
+                events: {
+                    onReady: function() {
+                        // Observe visibility once player is ready
+                        const videoEl = document.getElementById('recap-video');
+                        const observer = new IntersectionObserver(function(entries) {
+                            entries.forEach(function(entry) {
+                                if (!entry.isIntersecting && ytPlayer && ytPlayer.getPlayerState) {
+                                    // Pause if playing (state 1) or buffering (state 3)
+                                    var state = ytPlayer.getPlayerState();
+                                    if (state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING) {
+                                        ytPlayer.pauseVideo();
+                                    }
+                                }
+                            });
+                        }, { threshold: 0.2 });
+                        observer.observe(videoEl);
+                    }
+                }
+            });
+        };
+
+        // Load YouTube IFrame API script dynamically
+        (function() {
+            var tag = document.createElement('script');
+            tag.src = 'https://www.youtube.com/iframe_api';
+            document.head.appendChild(tag);
+        })();
+
+        // ── Security: Input sanitizer (strip HTML tags) ──
+        function sanitize(str) {
+            return str.replace(/[<>"'`]/g, function(c) {
+                return {'<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#x27;','`':'&#x60;'}[c];
+            }).trim();
+        }
+
+        // ── Security: Rate limiter (max 3 attempts per 10 minutes) ──
+        const RATE_LIMIT = { max: 3, windowMs: 10 * 60 * 1000 };
+        function isRateLimited() {
+            const now = Date.now();
+            let attempts = JSON.parse(sessionStorage.getItem('reg_attempts') || '[]');
+            attempts = attempts.filter(t => now - t < RATE_LIMIT.windowMs);
+            if (attempts.length >= RATE_LIMIT.max) return true;
+            attempts.push(now);
+            sessionStorage.setItem('reg_attempts', JSON.stringify(attempts));
+            return false;
+        }
+
+        // ── Security: Client-side field validation ──
+        function validateForm(data) {
+            const emailRe = /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/;
+            const phoneRe = /^[\+]?[0-9\s\-\(\)]{7,20}$/;
+            const nameRe  = /^[A-Za-z\u00C0-\u024F\s'\-]{2,100}$/;
+            if (!nameRe.test(data.full_name))   return 'Please enter a valid full name (letters only, 2–100 characters).';
+            if (!emailRe.test(data.email))       return 'Please enter a valid email address.';
+            if (!phoneRe.test(data.phone))       return 'Please enter a valid contact number.';
+            if (data.organization.length > 150)  return 'Organization name is too long.';
+            return null;
+        }
+
         // ── Form submit ──
         document.getElementById('registrationForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            this.reset();
-            const msg = document.getElementById('successMessage');
-            msg.classList.remove('hidden');
-            setTimeout(() => msg.classList.add('hidden'), 5000);
+
+            const errorEl  = document.getElementById('formError');
+            const submitBtn = document.getElementById('submitBtn');
+
+            function showError(msg) {
+                errorEl.textContent = msg;
+                errorEl.classList.remove('hidden');
+                setTimeout(() => errorEl.classList.add('hidden'), 6000);
+            }
+
+            // Honeypot check — bots fill the hidden field, humans leave it blank
+            const honeypot = this.querySelector('input[name="website"]').value;
+            if (honeypot) return; // silently reject bot
+
+            // Rate limit check
+            if (isRateLimited()) {
+                showError('Too many submissions. Please wait a few minutes before trying again.');
+                return;
+            }
+
+            // Collect and sanitize inputs
+            const data = {
+                full_name:    sanitize(document.getElementById('reg-name').value),
+                email:        sanitize(document.getElementById('reg-email').value),
+                phone:        sanitize(document.getElementById('reg-phone').value),
+                organization: sanitize(document.getElementById('reg-org').value),
+            };
+
+            // Validate
+            const validationError = validateForm(data);
+            if (validationError) {
+                showError(validationError);
+                return;
+            }
+
+            // Disable button to prevent double-submit
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting…';
+
+            // TODO: Replace this block with EmailJS or Formspree call
+            // emailjs.send('SERVICE_ID', 'TEMPLATE_ID', data).then(...)
+            setTimeout(() => {
+                this.reset();
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Registration';
+                const msg = document.getElementById('successMessage');
+                msg.classList.remove('hidden');
+                setTimeout(() => msg.classList.add('hidden'), 5000);
+            }, 600);
         });
     </script>
 </body>
