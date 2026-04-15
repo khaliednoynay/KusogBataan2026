@@ -10,7 +10,8 @@
                    font-src https://fonts.gstatic.com;
                    img-src 'self' data: https://images.unsplash.com https://*.ytimg.com;
                    connect-src 'self' https://api.emailjs.com https://script.google.com https://script.googleusercontent.com;
-                   frame-src https://www.youtube.com https://www.youtube-nocookie.com;
+                   frame-src https://www.youtube.com https://www.youtube-nocookie.com https://script.google.com https://script.googleusercontent.com;
+                   form-action https://script.google.com;
                    frame-ancestors 'none';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
@@ -449,6 +450,56 @@
                 </form>
             </div>
         </div>
+
+        <!-- ── Success modal ── -->
+        <div id="successModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center px-4">
+            <div id="successBackdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+            <div class="relative bg-white w-full max-w-md rounded-2xl shadow-2xl border border-gray-200 p-6 sm:p-8 text-center">
+                <div class="mx-auto mb-5 flex items-center justify-center w-16 h-16 rounded-full bg-green-100">
+                    <svg class="w-9 h-9 text-green-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                <h3 class="font-heading text-2xl sm:text-3xl font-bold text-kusog-dark mb-3">Registration Successful!</h3>
+                <p class="text-sm sm:text-base text-gray-600 leading-relaxed mb-6">
+                    Thank you for registering. Please check your email for payment instructions to complete your registration.
+                </p>
+                <div class="flex flex-col-reverse sm:flex-row gap-3">
+                    <button type="button" id="successClose"
+                            class="btn-dark flex-1 bg-gray-100 text-kusog-dark font-heading font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-lg border border-gray-300">
+                        Got it
+                    </button>
+                    <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank" rel="noopener noreferrer"
+                       id="successCheckEmail"
+                       class="btn-dark flex-1 bg-kusog-dark text-white font-heading font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-lg inline-flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l9 6 9-6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        Check Email
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Confirmation modal ── -->
+        <div id="confirmModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center px-4">
+            <div id="confirmBackdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+            <div class="relative bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-gray-200 p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+                <h3 class="font-heading text-2xl sm:text-3xl font-bold text-kusog-dark mb-1">Please Confirm</h3>
+                <p class="text-sm text-gray-500 mb-6">Review your details before submitting. You cannot edit after confirmation.</p>
+                <dl id="confirmList" class="space-y-3 text-sm border-t border-b border-gray-200 py-4 mb-6"></dl>
+                <div class="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4">
+                    <button type="button" id="confirmCancel"
+                            class="btn-dark flex-1 bg-gray-100 text-kusog-dark font-heading font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-lg border border-gray-300">
+                        Edit Details
+                    </button>
+                    <button type="button" id="confirmSubmit"
+                            class="btn-dark flex-1 bg-kusog-dark text-white font-heading font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-lg">
+                        Confirm &amp; Submit
+                    </button>
+                </div>
+            </div>
+        </div>
     </section>
 
     <footer class="bg-kusog-dark py-10 sm:py-12">
@@ -573,22 +624,67 @@
             return null;
         }
 
-        // ── Form submit ──
-        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+        // ── Form submit flow: validate → confirm modal → POST ──
+        const SHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxKLuo3PG0ZIIBdMG4vznEMvu1YyWV9EoMZienn2cW7yO5dn5ONJjE3v6ONl4xmJ4NZ/exec';
+        const FORM_TOKEN = 'kusog-2026-7f3a9c2e';
+
+        const regForm      = document.getElementById('registrationForm');
+        const submitBtn    = document.getElementById('submitBtn');
+        const errorEl      = document.getElementById('formError');
+        const successEl    = document.getElementById('successMessage');
+        const modal        = document.getElementById('confirmModal');
+        const modalList    = document.getElementById('confirmList');
+        const modalBackdrop= document.getElementById('confirmBackdrop');
+        const modalCancel  = document.getElementById('confirmCancel');
+        const modalSubmit  = document.getElementById('confirmSubmit');
+        const successModal     = document.getElementById('successModal');
+        const successBackdrop  = document.getElementById('successBackdrop');
+        const successClose     = document.getElementById('successClose');
+
+        let pendingData = null;
+
+        function showError(msg) {
+            errorEl.textContent = msg;
+            errorEl.classList.remove('hidden');
+            setTimeout(() => errorEl.classList.add('hidden'), 6000);
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, c => ({
+                '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#x27;'
+            }[c]));
+        }
+
+        function openConfirmModal(data) {
+            const rows = [
+                ['First Name',        data.first_name],
+                ['Middle Name',       data.middle_name || '—'],
+                ['Last Name',         data.last_name],
+                ['Email Address',     data.email],
+                ['Contact Number',    data.phone],
+                ['Church / Organization', data.organization || '—'],
+            ];
+            modalList.innerHTML = rows.map(([k, v]) => `
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1">
+                    <dt class="text-xs uppercase tracking-wider font-semibold text-gray-500">${escapeHtml(k)}</dt>
+                    <dd class="text-sm font-medium text-kusog-dark sm:text-right break-words">${escapeHtml(v)}</dd>
+                </div>
+            `).join('');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeConfirmModal() {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        regForm.addEventListener('submit', function(e) {
             e.preventDefault();
-
-            const errorEl  = document.getElementById('formError');
-            const submitBtn = document.getElementById('submitBtn');
-
-            function showError(msg) {
-                errorEl.textContent = msg;
-                errorEl.classList.remove('hidden');
-                setTimeout(() => errorEl.classList.add('hidden'), 6000);
-            }
 
             // Honeypot check — bots fill the hidden field, humans leave it blank
             const honeypot = this.querySelector('input[name="website"]').value;
-            if (honeypot) return; // silently reject bot
+            if (honeypot) return;
 
             // Rate limit check
             if (isRateLimited()) {
@@ -596,13 +692,10 @@
                 return;
             }
 
-            // Shared token — must match SHARED_TOKEN in apps-script.gs
-            const FORM_TOKEN = 'kusog-2026-7f3a9c2e';
-
             // Collect and sanitize inputs
             const data = {
                 token:        FORM_TOKEN,
-                website:      this.querySelector('input[name="website"]').value, // honeypot echo for server-side check
+                website:      honeypot,
                 ts:           Date.now(),
                 first_name:   sanitize(document.getElementById('reg-first-name').value),
                 middle_name:  sanitize(document.getElementById('reg-middle-name').value),
@@ -612,47 +705,94 @@
                 organization: sanitize(document.getElementById('reg-org').value),
             };
 
-            // Validate
+            // Validate BEFORE showing the modal
             const validationError = validateForm(data);
             if (validationError) {
                 showError(validationError);
                 return;
             }
 
-            // Disable button to prevent double-submit
+            // Stash and open confirmation modal
+            pendingData = data;
+            openConfirmModal(data);
+        });
+
+        // ── Modal interactions ──
+        modalCancel.addEventListener('click', () => {
+            pendingData = null;
+            closeConfirmModal();
+        });
+
+        modalBackdrop.addEventListener('click', () => {
+            pendingData = null;
+            closeConfirmModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                pendingData = null;
+                closeConfirmModal();
+            }
+        });
+
+        modalSubmit.addEventListener('click', () => {
+            if (!pendingData) return;
+            const data = pendingData;
+            pendingData = null;
+            closeConfirmModal();
+
             submitBtn.disabled = true;
             submitBtn.textContent = 'Submitting…';
 
-            // Google Sheets endpoint — paste your Apps Script Web App URL here
-            const SHEET_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzAit3p7e5QlANui2X6LogF_W4XtSJry-TrkqfeV4RLCc-pLa-UW2g9sitQDhJ2p8Zt/exec';
+            // Hidden-iframe submit: bulletproof for Apps Script Web Apps
+            const iframeName = 'kusog-submit-frame';
+            let iframe = document.getElementById(iframeName);
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.name = iframeName;
+                iframe.id = iframeName;
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+            }
 
-            const form = this;
-            console.log('[Kusog] Submitting to:', SHEET_ENDPOINT);
-            console.log('[Kusog] Payload:', data);
+            const hiddenForm = document.createElement('form');
+            hiddenForm.method = 'POST';
+            hiddenForm.action = SHEET_ENDPOINT;
+            hiddenForm.target = iframeName;
 
-            // Apps Script Web App: use FormData to avoid CORS preflight.
-            // Server reads it as e.parameter.payload (JSON string).
-            const formData = new FormData();
-            formData.append('payload', JSON.stringify(data));
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'payload';
+            input.value = JSON.stringify(data);
+            hiddenForm.appendChild(input);
 
-            fetch(SHEET_ENDPOINT, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: formData
-            }).then((res) => {
-                console.log('[Kusog] Fetch resolved:', res);
-                form.reset();
+            document.body.appendChild(hiddenForm);
+            hiddenForm.submit();
+            document.body.removeChild(hiddenForm);
+
+            setTimeout(() => {
+                regForm.reset();
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Registration';
-                const msg = document.getElementById('successMessage');
-                msg.classList.remove('hidden');
-                setTimeout(() => msg.classList.add('hidden'), 5000);
-            }).catch((err) => {
-                console.error('[Kusog] Fetch failed:', err);
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Registration';
-                showError('Could not submit right now. Please try again shortly.');
-            });
+                openSuccessModal();
+            }, 1200);
+        });
+
+        // ── Success modal interactions ──
+        function openSuccessModal() {
+            successModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSuccessModal() {
+            successModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        successClose.addEventListener('click', closeSuccessModal);
+        successBackdrop.addEventListener('click', closeSuccessModal);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !successModal.classList.contains('hidden')) {
+                closeSuccessModal();
+            }
         });
     </script>
 </body>
